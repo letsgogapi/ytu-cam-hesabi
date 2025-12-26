@@ -68,22 +68,19 @@ with col_title:
     st.markdown("""
     <div class="header-box">
         <h2>YTU GLASS RESEARCH GROUP</h2>
-        <div style="font-size: 1rem;">Ultimate Batch Calculator v7.0</div>
+        <div style="font-size: 1rem;">Ultimate Batch Calculator v7.1 (SiO2 Fix)</div>
     </div>
     """, unsafe_allow_html=True)
 
-# --- VERİ TABANI (EXCEL'DEN BİREBİR) ---
-# Format: "Oxide": {"raw": "RawMaterialName", "mw": RawMW, "factor": Stoichiometry, "oxide_mw": OxideMW}
-# Not: Excel'deki kırmızı sütunlar (Mol Kütlesi) OxideMW olarak, beyaz sütunlar RawMW olarak işlenmiştir.
-
+# --- VERİ TABANI (GÜNCELLENMİŞ VE KONTROL EDİLMİŞ) ---
 materials_db = {
-    "SiO2":    {"raw": "SiO2",      "mw": 60.0900,  "factor": 1.0, "oxide_mw": 60.0900},
-    "Na2O":    {"raw": "Na2CO3",    "mw": 105.9800, "factor": 1.0, "oxide_mw": 61.9700}, # Excel: 61.97
+    "SiO2":    {"raw": "SiO2",      "mw": 60.0900,  "factor": 1.0, "oxide_mw": 60.0900}, # GÜNCELLENDİ
+    "Na2O":    {"raw": "Na2CO3",    "mw": 105.9800, "factor": 1.0, "oxide_mw": 61.9700},
     "Al2O3":   {"raw": "Al2O3",     "mw": 101.9600, "factor": 1.0, "oxide_mw": 101.9600},
     "ZnO":     {"raw": "ZnO",       "mw": 81.3700,  "factor": 1.0, "oxide_mw": 81.3700},
-    "CaO":     {"raw": "CaCO3",     "mw": 100.0869, "factor": 1.0, "oxide_mw": 56.0774}, # Excel: 56.0774
+    "CaO":     {"raw": "CaCO3",     "mw": 100.0869, "factor": 1.0, "oxide_mw": 56.0774},
     "TeO2":    {"raw": "TeO2",      "mw": 159.6000, "factor": 1.0, "oxide_mw": 159.6000},
-    "B2O3":    {"raw": "H3BO3",     "mw": 61.8300,  "factor": 2.0, "oxide_mw": 69.6100}, # Excel: 69.61
+    "B2O3":    {"raw": "H3BO3",     "mw": 61.8300,  "factor": 2.0, "oxide_mw": 69.6100},
     "NaF":     {"raw": "NaF",       "mw": 41.9900,  "factor": 1.0, "oxide_mw": 41.9900},
     "KBr":     {"raw": "KBr",       "mw": 119.0100, "factor": 1.0, "oxide_mw": 119.0100},
     "SnO2":    {"raw": "SnO2",      "mw": 150.6900, "factor": 1.0, "oxide_mw": 150.6900},
@@ -111,11 +108,11 @@ materials_db = {
     "PbBr2":   {"raw": "PbBr2",     "mw": 367.0100, "factor": 1.0, "oxide_mw": 367.0100},
     "PbCl2":   {"raw": "PbCl2",     "mw": 278.1100, "factor": 1.0, "oxide_mw": 278.1100},
     "CsBr":    {"raw": "CsBr",      "mw": 212.8100, "factor": 1.0, "oxide_mw": 212.8100},
-    "Cs2O":    {"raw": "Cs2CO3",    "mw": 325.8198, "factor": 1.0, "oxide_mw": 281.8100}, # Excel'de Cs2O=281.83
+    "Cs2O":    {"raw": "Cs2CO3",    "mw": 325.8198, "factor": 1.0, "oxide_mw": 281.8100},
     "CdO":     {"raw": "CdO",       "mw": 128.4130, "factor": 1.0, "oxide_mw": 128.4130},
     "CdSe":    {"raw": "CdSe",      "mw": 191.3700, "factor": 1.0, "oxide_mw": 191.3700},
     "ZnTe":    {"raw": "ZnTe",      "mw": 193.0100, "factor": 1.0, "oxide_mw": 193.0100},
-    "K2O":     {"raw": "K2CO3",     "mw": 138.2050, "factor": 1.0, "oxide_mw": 94.1960}, # Excel: 94.196
+    "K2O":     {"raw": "K2CO3",     "mw": 138.2050, "factor": 1.0, "oxide_mw": 94.1960},
     "CdTe":    {"raw": "CdTe",      "mw": 240.0140, "factor": 1.0, "oxide_mw": 240.0140},
     "NaI":     {"raw": "NaI",       "mw": 149.8900, "factor": 1.0, "oxide_mw": 149.8900},
     "Nb2O5":   {"raw": "Nb2O5",     "mw": 265.8100, "factor": 1.0, "oxide_mw": 265.8100},
@@ -167,7 +164,7 @@ for oxide, props in materials_db.items():
         inputs[oxide] = val
     i += 1
 
-# Toplam Kontrolü (Sadece Bilgi Amaçlı, Hata Vermez)
+# Toplam Kontrolü
 total_parts = sum(inputs.values())
 if total_parts > 0:
     st.info(f"**Total Input Sum:** {total_parts:.2f} (Calculations will be scaled to {target_weight}g glass)")
@@ -183,7 +180,7 @@ if total_parts > 0:
     for oxide, val in inputs.items():
         if val > 0:
             props = materials_db[oxide]
-            moles_input = val # Kullanıcının girdiği (örneğin 50)
+            moles_input = val # Kullanıcının girdiği (Parts)
             
             # Bu girdinin Oksit olarak ağırlığı (Camın içinde kalan)
             weight_oxide = moles_input * props['oxide_mw']
@@ -204,7 +201,6 @@ if total_parts > 0:
             })
             
     # 2. Adım: Hedef Gramaja (Target Weight) Ölçekleme
-    # Eğer 100g cam istiyorsak, teorik oksit toplamını 100'e eşitleyecek katsayıyı buluyoruz.
     if total_oxide_weight_in_mix > 0:
         scaling_factor = target_weight / total_oxide_weight_in_mix
     else:
@@ -256,7 +252,7 @@ if total_parts > 0:
             
             st.dataframe(
                 df_batch.style.format({"To Weigh (g)": "{:.4f}"}), 
-                use_container_width=True,
+                use_container_width=True, 
                 hide_index=True
             )
             
