@@ -43,11 +43,11 @@ with col_title:
     st.markdown("""
     <div class="header-box">
         <h2>YTU GLASS RESEARCH GROUP</h2>
-        <div style="font-size: 1rem;">Batch Calculator v8.0 (Recipe Manager)</div>
+        <div style="font-size: 1rem;">Batch Calculator v8.1 (Final)</div>
     </div>
     """, unsafe_allow_html=True)
 
-# --- VERİ TABANI (HASSAS AYARLI) ---
+# --- VERİ TABANI ---
 materials_db = {
     "SiO2":    {"raw": "SiO2",      "mw": 60.0900,  "factor": 1.0, "oxide_mw": 60.0900},
     "Na2O":    {"raw": "Na2CO3",    "mw": 105.9800, "factor": 1.0, "oxide_mw": 61.9700},
@@ -240,17 +240,11 @@ if total_parts > 0:
             hide_index=True
         )
         
-        # CSV İndir
-        csv = df_batch.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📥 Download Recipe as CSV",
-            data=csv,
-            file_name='ytu_glass_batch.csv',
-            mime='text/csv'
-        )
+        # CSV İndirme Butonu KALDIRILDI.
+        
 else:
     st.info("Enter values above to start calculation.")
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | v8.0 Recipe Manager</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | v8.1 Final</div>", unsafe_allow_html=True)
