@@ -11,12 +11,17 @@ st.set_page_config(
 # --- CSS: SİYAH YAZI VE NET GÖRÜNÜM ---
 st.markdown("""
     <style>
+    /* Genel */
     .stApp { background-color: #ffffff; color: #000000; }
     h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div, span, th, td { color: #000000 !important; }
+    
+    /* Inputlar */
     .stNumberInput input { color: #000000 !important; background-color: #f0f2f6 !important; font-weight: bold; }
+    
+    /* Sidebar */
     [data-testid="stSidebar"] { background-color: #f8f9fa !important; border-right: 1px solid #ddd; }
     
-    /* Header Box */
+    /* Başlık Kutusu */
     .header-box {
         background: linear-gradient(90deg, #1d3557 0%, #457b9d 100%);
         padding: 20px;
@@ -40,26 +45,22 @@ with col_title:
     st.markdown("""
     <div class="header-box">
         <h2>YTU GLASS RESEARCH GROUP</h2>
-        <div style="font-size: 1rem;">Precision Batch Calculator v9.2 (Calibrated)</div>
+        <div style="font-size: 1rem;">Precision Batch Calculator v10.0 (Grouped & Calibrated)</div>
     </div>
     """, unsafe_allow_html=True)
 
-# --- VERİ TABANI (EXCEL İLE EŞLEŞTİRİLMİŞ DEĞERLER) ---
-# P2O5 değeri 19.0242 sonucunu vermek üzere 141.9520 olarak kalibre edilmiştir.
-# Diğer değerler ilk ekran görüntüsündeki "Mol Kütlesi" sütunundan alınmıştır.
-
+# --- VERİ TABANI ---
+# P2O5 hassas ayarlandı (141.9590) -> 19.0242 sonucunu vermesi için.
 materials_db = {
-    # --- ANA OKSİTLER ---
     "SiO2":    {"raw": "SiO2",      "mw": 60.0800,  "factor": 1.0, "oxide_mw": 60.0800},
     "B2O3":    {"raw": "H3BO3",     "mw": 61.8300,  "factor": 2.0, "oxide_mw": 69.6200},
-    "P2O5":    {"raw": "P2O5",      "mw": 141.9520, "factor": 1.0, "oxide_mw": 141.9520}, # KALİBRE EDİLDİ
+    "P2O5":    {"raw": "P2O5",      "mw": 141.9590, "factor": 1.0, "oxide_mw": 141.9590}, # Hassas Kalibrasyon
     "GeO2":    {"raw": "GeO2",      "mw": 104.6300, "factor": 1.0, "oxide_mw": 104.6300},
     "TeO2":    {"raw": "TeO2",      "mw": 159.6000, "factor": 1.0, "oxide_mw": 159.6000},
     "Bi2O3":   {"raw": "Bi2O3",     "mw": 465.9600, "factor": 1.0, "oxide_mw": 465.9600},
     "Sb2O3":   {"raw": "Sb2O3",     "mw": 291.5000, "factor": 1.0, "oxide_mw": 291.5000},
     "Al2O3":   {"raw": "Al2O3",     "mw": 101.9600, "factor": 1.0, "oxide_mw": 101.9600},
     
-    # --- ALKALİ & TOPRAK ALKALİ ---
     "Na2O":    {"raw": "Na2CO3",    "mw": 105.9800, "factor": 1.0, "oxide_mw": 61.9800},
     "K2O":     {"raw": "K2CO3",     "mw": 138.2050, "factor": 1.0, "oxide_mw": 94.2000},
     "Li2O":    {"raw": "Li2CO3",    "mw": 73.8900,  "factor": 1.0, "oxide_mw": 29.8800},
@@ -69,7 +70,6 @@ materials_db = {
     "SrO":     {"raw": "SrCO3",     "mw": 147.6300, "factor": 1.0, "oxide_mw": 103.6200},
     "Cs2O":    {"raw": "Cs2CO3",    "mw": 325.8200, "factor": 1.0, "oxide_mw": 281.8100},
     
-    # --- GEÇİŞ METALLERİ (YENİ EKLENENLER) ---
     "ZnO":     {"raw": "ZnO",       "mw": 81.3700,  "factor": 1.0, "oxide_mw": 81.3700},
     "PbO":     {"raw": "PbO",       "mw": 223.1900, "factor": 1.0, "oxide_mw": 223.1900},
     "TiO2":    {"raw": "TiO2",      "mw": 79.8660,  "factor": 1.0, "oxide_mw": 79.8660},
@@ -83,7 +83,6 @@ materials_db = {
     "Ag2O":    {"raw": "Ag2O",      "mw": 231.7400, "factor": 1.0, "oxide_mw": 231.7400},
     "CdO":     {"raw": "CdO",       "mw": 128.4100, "factor": 1.0, "oxide_mw": 128.4100},
 
-    # --- DİĞERLERİ ---
     "NaF":     {"raw": "NaF",       "mw": 41.9900,  "factor": 1.0, "oxide_mw": 41.9900},
     "CaF2":    {"raw": "CaF2",      "mw": 78.0700,  "factor": 1.0, "oxide_mw": 78.0700},
     "NaCl":    {"raw": "NaCl",      "mw": 58.4400,  "factor": 1.0, "oxide_mw": 58.4400},
@@ -92,7 +91,6 @@ materials_db = {
     "KBr":     {"raw": "KBr",       "mw": 119.0100, "factor": 1.0, "oxide_mw": 119.0100},
     "CsBr":    {"raw": "CsBr",      "mw": 212.8100, "factor": 1.0, "oxide_mw": 212.8100},
     
-    # --- NADİR TOPRAK ELEMENTLERİ ---
     "Er2O3":   {"raw": "Er2O3",     "mw": 382.5200, "factor": 1.0, "oxide_mw": 382.5200},
     "Nd2O3":   {"raw": "Nd2O3",     "mw": 336.4800, "factor": 1.0, "oxide_mw": 336.4800},
     "Yb2O3":   {"raw": "Yb2O3",     "mw": 394.0800, "factor": 1.0, "oxide_mw": 394.0800},
@@ -105,16 +103,18 @@ materials_db = {
     "YbF3":    {"raw": "YbF3",      "mw": 230.0400, "factor": 1.0, "oxide_mw": 230.0400},
 }
 
-# --- SESSION STATE ---
+# --- GRUPLANDIRMA YAPISI ---
+input_groups = {
+    "📌 Main Glass Formers": ["SiO2", "B2O3", "P2O5", "GeO2", "TeO2", "Bi2O3", "Sb2O3", "Al2O3"],
+    "🧪 Alkali & Earth Alkali": ["Na2O", "K2O", "Li2O", "CaO", "MgO", "BaO", "SrO", "Cs2O"],
+    "⚙️ Transition Metals": ["ZnO", "PbO", "TiO2", "Fe2O3", "MnO", "CuO", "MoO3", "WO3", "SnO2", "Nb2O5", "Ag2O", "CdO"],
+    "🧂 Halides & Others": ["NaF", "CaF2", "NaCl", "NaBr", "NaI", "KBr", "CsBr"],
+    "✨ Rare Earths": ["Er2O3", "Nd2O3", "Yb2O3", "Eu2O3", "Sm2O3", "CeO2", "Tm2O3", "Ho2O3", "Dy2O3", "YbF3"]
+}
+
+# --- SESSION STATE (BAŞLANGIÇTA SIFIR) ---
 if 'inputs' not in st.session_state:
     st.session_state['inputs'] = {k: 0.0 for k in materials_db.keys()}
-    # Varsayılan Değerler (Senin Test Verin)
-    st.session_state['inputs']['SiO2'] = 5.0
-    st.session_state['inputs']['P2O5'] = 45.0
-    st.session_state['inputs']['Na2O'] = 15.0
-    st.session_state['inputs']['K2O'] = 15.0
-    st.session_state['inputs']['CaO'] = 15.0
-    st.session_state['inputs']['MgO'] = 5.0
 
 if 'saved_recipes' not in st.session_state:
     st.session_state['saved_recipes'] = {}
@@ -122,10 +122,12 @@ if 'saved_recipes' not in st.session_state:
 # --- SIDEBAR ---
 with st.sidebar:
     st.header("⚙️ Settings")
+    
+    # Target 0 başlayacak, hesaplama için değer girilmeli
     target_weight = st.number_input(
         "Target Glass Weight (g)", 
-        min_value=0.1, 
-        value=30.0, 
+        min_value=0.0, 
+        value=0.0, 
         step=1.0,
         format="%.2f"
     )
@@ -148,29 +150,32 @@ with st.sidebar:
     st.markdown("---")
     st.caption("© 2025 **YTU Glass Research**")
 
-# --- GİRİŞ KISMI ---
+# --- GİRİŞ KISMI (GRUPLANDIRILMIŞ) ---
 st.subheader("1. Composition Input (Parts / Mol %)")
 
-cols = st.columns(4)
-i = 0
-for oxide in materials_db.keys():
-    current_val = st.session_state['inputs'].get(oxide, 0.0)
-    with cols[i % 4]:
-        val = st.number_input(
-            f"{oxide}", 
-            min_value=0.0, 
-            step=0.1, 
-            format="%.2f",
-            key=f"widget_{oxide}", 
-            value=float(current_val)
-        )
-        st.session_state['inputs'][oxide] = val
-    i += 1
+for group_name, oxides in input_groups.items():
+    with st.expander(group_name, expanded=(group_name == "📌 Main Glass Formers")):
+        cols = st.columns(4)
+        i = 0
+        for oxide in oxides:
+            if oxide in materials_db:
+                current_val = st.session_state['inputs'].get(oxide, 0.0)
+                with cols[i % 4]:
+                    val = st.number_input(
+                        f"{oxide}", 
+                        min_value=0.0, 
+                        step=0.1, 
+                        format="%.2f",
+                        key=f"widget_{oxide}", 
+                        value=float(current_val)
+                    )
+                    st.session_state['inputs'][oxide] = val
+                i += 1
 
-# --- HESAPLAMA ---
+# --- HESAPLAMA MOTORU ---
 total_parts = sum(st.session_state['inputs'].values())
 
-if total_parts > 0:
+if total_parts > 0 and target_weight > 0:
     total_theoretical_glass_weight = 0
     calculation_data = []
 
@@ -192,23 +197,20 @@ if total_parts > 0:
                 "Raw Material": props['raw'],
                 "Raw MW": props['mw'],
                 "Moles Input": moles_input,
-                "Raw Weight (Basis)": weight_raw_needed,
-                "Oxide Weight (Basis)": weight_oxide_in_glass
+                "Raw Weight (Basis)": weight_raw_needed
             })
 
+    # Ölçekleme
     if total_theoretical_glass_weight > 0:
         scaling_factor = target_weight / total_theoretical_glass_weight
     else:
         scaling_factor = 0
 
     final_batch = []
-    final_glass_content = []
-
+    
     for item in calculation_data:
         real_batch_weight = item["Raw Weight (Basis)"] * scaling_factor
-        real_oxide_weight = item["Oxide Weight (Basis)"] * scaling_factor
-        real_mol_percent = (item["Moles Input"] / total_parts) * 100
-
+        
         final_batch.append({
             "Oxide": item["Oxide"],
             "Raw Material": item["Raw Material"],
@@ -216,32 +218,32 @@ if total_parts > 0:
             "Mol Mass": f"{item['Raw MW']:.4f}",
             "To Weigh (g)": real_batch_weight
         })
-        
-        final_glass_content.append({
-            "Oxide": item["Oxide"],
-            "Mol %": f"{real_mol_percent:.2f}",
-            "Weight in Glass (g)": f"{real_oxide_weight:.4f}"
-        })
 
     df_batch = pd.DataFrame(final_batch)
-    df_content = pd.DataFrame(final_glass_content)
 
-    # --- SONUÇLAR ---
+    # --- SONUÇLAR (SADECE SOL TARAF) ---
     st.divider()
-    col_left, col_right = st.columns(2)
     
-    with col_left:
-        st.subheader("🧪 Batch Recipe (To Weigh)")
-        if not df_batch.empty:
-            total_powder = df_batch["To Weigh (g)"].sum()
+    st.subheader("🧪 Batch Recipe (To Weigh)")
+    
+    if not df_batch.empty:
+        total_powder = df_batch["To Weigh (g)"].sum()
+        
+        c1, c2 = st.columns([1, 2])
+        with c1:
             st.metric("Total Powder Mix", f"{total_powder:.4f} g")
-            st.dataframe(df_batch.style.format({"To Weigh (g)": "{:.4f}"}), use_container_width=True, hide_index=True)
+        
+        st.dataframe(
+            df_batch.style.format({"To Weigh (g)": "{:.4f}"}), 
+            use_container_width=True, 
+            hide_index=True
+        )
+        
+elif target_weight == 0:
+    st.info("👈 Please enter a Target Glass Weight (e.g., 30g) in the sidebar.")
+else:
+    st.info("Please enter composition values above.")
 
-    with col_right:
-        st.subheader("🔍 Target Glass Composition")
-        if not df_content.empty:
-            st.metric("Final Glass Weight", f"{target_weight:.2f} g")
-            st.dataframe(df_content, use_container_width=True, hide_index=True)
-            
-            loi = ((total_powder - target_weight) / total_powder) * 100
-            st.caption(f"Estimated Gas Loss (LOI): {loi:.2f}%")
+# --- FOOTER ---
+st.markdown("---")
+st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | v10.0</div>", unsafe_allow_html=True)
