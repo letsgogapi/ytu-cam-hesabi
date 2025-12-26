@@ -31,6 +31,18 @@ st.markdown("""
         color: white !important;
     }
     .header-box h2, .header-box div { color: white !important; }
+
+    /* Reset Butonu Özel Stil */
+    div.stButton > button:first-child {
+        background-color: #ff4b4b;
+        color: white;
+        border: none;
+        font-weight: bold;
+    }
+    div.stButton > button:first-child:hover {
+        background-color: #ff3333;
+        color: white;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -45,16 +57,16 @@ with col_title:
     st.markdown("""
     <div class="header-box">
         <h2>YTU GLASS RESEARCH GROUP</h2>
-        <div style="font-size: 1rem;">Precision Batch Calculator v10.0 (Grouped & Calibrated)</div>
+        <div style="font-size: 1rem;">Precision Batch Calculator v10.1 (Reset Added)</div>
     </div>
     """, unsafe_allow_html=True)
 
 # --- VERİ TABANI ---
-# P2O5 hassas ayarlandı (141.9590) -> 19.0242 sonucunu vermesi için.
+# P2O5 hassas kalibre: 141.9590 -> 19.0242 sonucu için.
 materials_db = {
     "SiO2":    {"raw": "SiO2",      "mw": 60.0800,  "factor": 1.0, "oxide_mw": 60.0800},
     "B2O3":    {"raw": "H3BO3",     "mw": 61.8300,  "factor": 2.0, "oxide_mw": 69.6200},
-    "P2O5":    {"raw": "P2O5",      "mw": 141.9590, "factor": 1.0, "oxide_mw": 141.9590}, # Hassas Kalibrasyon
+    "P2O5":    {"raw": "P2O5",      "mw": 141.9590, "factor": 1.0, "oxide_mw": 141.9590},
     "GeO2":    {"raw": "GeO2",      "mw": 104.6300, "factor": 1.0, "oxide_mw": 104.6300},
     "TeO2":    {"raw": "TeO2",      "mw": 159.6000, "factor": 1.0, "oxide_mw": 159.6000},
     "Bi2O3":   {"raw": "Bi2O3",     "mw": 465.9600, "factor": 1.0, "oxide_mw": 465.9600},
@@ -103,7 +115,7 @@ materials_db = {
     "YbF3":    {"raw": "YbF3",      "mw": 230.0400, "factor": 1.0, "oxide_mw": 230.0400},
 }
 
-# --- GRUPLANDIRMA YAPISI ---
+# --- GRUPLANDIRMA ---
 input_groups = {
     "📌 Main Glass Formers": ["SiO2", "B2O3", "P2O5", "GeO2", "TeO2", "Bi2O3", "Sb2O3", "Al2O3"],
     "🧪 Alkali & Earth Alkali": ["Na2O", "K2O", "Li2O", "CaO", "MgO", "BaO", "SrO", "Cs2O"],
@@ -112,7 +124,7 @@ input_groups = {
     "✨ Rare Earths": ["Er2O3", "Nd2O3", "Yb2O3", "Eu2O3", "Sm2O3", "CeO2", "Tm2O3", "Ho2O3", "Dy2O3", "YbF3"]
 }
 
-# --- SESSION STATE (BAŞLANGIÇTA SIFIR) ---
+# --- SESSION STATE ---
 if 'inputs' not in st.session_state:
     st.session_state['inputs'] = {k: 0.0 for k in materials_db.keys()}
 
@@ -123,13 +135,24 @@ if 'saved_recipes' not in st.session_state:
 with st.sidebar:
     st.header("⚙️ Settings")
     
-    # Target 0 başlayacak, hesaplama için değer girilmeli
+    # RESET BUTONU
+    if st.button("🗑️ Reset All (Her Şeyi Sıfırla)"):
+        # Tüm inputları sıfırla
+        for oxide in materials_db.keys():
+            st.session_state[f"widget_{oxide}"] = 0.0
+            st.session_state['inputs'][oxide] = 0.0
+        # Target Weight sıfırla
+        st.session_state["target_weight_input"] = 0.0
+        st.rerun()
+
+    # Target Weight Widget
     target_weight = st.number_input(
         "Target Glass Weight (g)", 
         min_value=0.0, 
         value=0.0, 
         step=1.0,
-        format="%.2f"
+        format="%.2f",
+        key="target_weight_input"
     )
     
     st.markdown("---")
@@ -150,7 +173,7 @@ with st.sidebar:
     st.markdown("---")
     st.caption("© 2025 **YTU Glass Research**")
 
-# --- GİRİŞ KISMI (GRUPLANDIRILMIŞ) ---
+# --- GİRİŞ KISMI ---
 st.subheader("1. Composition Input (Parts / Mol %)")
 
 for group_name, oxides in input_groups.items():
@@ -184,7 +207,7 @@ if total_parts > 0 and target_weight > 0:
             props = materials_db[oxide]
             moles_input = val
             
-            # Oksit Ağırlığı (Cam İçindeki)
+            # Oksit Ağırlığı
             weight_oxide_in_glass = moles_input * props['oxide_mw']
             total_theoretical_glass_weight += weight_oxide_in_glass
             
@@ -221,7 +244,7 @@ if total_parts > 0 and target_weight > 0:
 
     df_batch = pd.DataFrame(final_batch)
 
-    # --- SONUÇLAR (SADECE SOL TARAF) ---
+    # --- SONUÇLAR (SADECE LİSTE) ---
     st.divider()
     
     st.subheader("🧪 Batch Recipe (To Weigh)")
@@ -240,10 +263,10 @@ if total_parts > 0 and target_weight > 0:
         )
         
 elif target_weight == 0:
-    st.info("👈 Please enter a Target Glass Weight (e.g., 30g) in the sidebar.")
+    st.info("👈 Please enter a **Target Glass Weight** (e.g., 30g) in the sidebar.")
 else:
     st.info("Please enter composition values above.")
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | v10.0</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | v10.1</div>", unsafe_allow_html=True)
