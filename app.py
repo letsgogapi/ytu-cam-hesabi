@@ -77,7 +77,7 @@ with col_title:
 # Not: Excel'deki kırmızı sütunlar (Mol Kütlesi) OxideMW olarak, beyaz sütunlar RawMW olarak işlenmiştir.
 
 materials_db = {
-    "SiO2":    {"raw": "SiO2",      "mw": 60.0800,  "factor": 1.0, "oxide_mw": 60.0800},
+    "SiO2":    {"raw": "SiO2",      "mw": 60.0900,  "factor": 1.0, "oxide_mw": 60.0900},
     "Na2O":    {"raw": "Na2CO3",    "mw": 105.9800, "factor": 1.0, "oxide_mw": 61.9700}, # Excel: 61.97
     "Al2O3":   {"raw": "Al2O3",     "mw": 101.9600, "factor": 1.0, "oxide_mw": 101.9600},
     "ZnO":     {"raw": "ZnO",       "mw": 81.3700,  "factor": 1.0, "oxide_mw": 81.3700},
@@ -88,9 +88,9 @@ materials_db = {
     "KBr":     {"raw": "KBr",       "mw": 119.0100, "factor": 1.0, "oxide_mw": 119.0100},
     "SnO2":    {"raw": "SnO2",      "mw": 150.6900, "factor": 1.0, "oxide_mw": 150.6900},
     "PbO":     {"raw": "PbO",       "mw": 223.1900, "factor": 1.0, "oxide_mw": 223.1900},
-    "NaBr":    {"raw": "NaBr",      "mw": 102.8900, "factor": 1.0, "oxide_mw": 102.8900},
+    "NaBr":    {"raw": "NaBr",      "mw": 102.3900, "factor": 1.0, "oxide_mw": 102.3900},
     "NaCl":    {"raw": "NaCl",      "mw": 58.4400,  "factor": 1.0, "oxide_mw": 58.4400},
-    "GeO2":    {"raw": "GeO2",      "mw": 104.6300, "factor": 1.0, "oxide_mw": 104.6300},
+    "GeO2":    {"raw": "GeO2",      "mw": 104.6100, "factor": 1.0, "oxide_mw": 104.6100},
     "WO3":     {"raw": "WO3",       "mw": 231.8500, "factor": 1.0, "oxide_mw": 231.8500},
     "Li2O":    {"raw": "Li2CO3",    "mw": 73.8900,  "factor": 1.0, "oxide_mw": 29.8800},
     "Bi2O3":   {"raw": "Bi2O3",     "mw": 465.9600, "factor": 1.0, "oxide_mw": 465.9600},
@@ -111,16 +111,16 @@ materials_db = {
     "PbBr2":   {"raw": "PbBr2",     "mw": 367.0100, "factor": 1.0, "oxide_mw": 367.0100},
     "PbCl2":   {"raw": "PbCl2",     "mw": 278.1100, "factor": 1.0, "oxide_mw": 278.1100},
     "CsBr":    {"raw": "CsBr",      "mw": 212.8100, "factor": 1.0, "oxide_mw": 212.8100},
-    "Cs2O":    {"raw": "Cs2CO3",    "mw": 325.8200, "factor": 1.0, "oxide_mw": 281.8300}, # Excel'de Cs2O=281.83
-    "CdO":     {"raw": "CdO",       "mw": 128.4100, "factor": 1.0, "oxide_mw": 128.4100},
+    "Cs2O":    {"raw": "Cs2CO3",    "mw": 325.8198, "factor": 1.0, "oxide_mw": 281.8100}, # Excel'de Cs2O=281.83
+    "CdO":     {"raw": "CdO",       "mw": 128.4130, "factor": 1.0, "oxide_mw": 128.4130},
     "CdSe":    {"raw": "CdSe",      "mw": 191.3700, "factor": 1.0, "oxide_mw": 191.3700},
     "ZnTe":    {"raw": "ZnTe",      "mw": 193.0100, "factor": 1.0, "oxide_mw": 193.0100},
     "K2O":     {"raw": "K2CO3",     "mw": 138.2050, "factor": 1.0, "oxide_mw": 94.1960}, # Excel: 94.196
-    "CdTe":    {"raw": "CdTe",      "mw": 240.0300, "factor": 1.0, "oxide_mw": 240.0300},
+    "CdTe":    {"raw": "CdTe",      "mw": 240.0140, "factor": 1.0, "oxide_mw": 240.0140},
     "NaI":     {"raw": "NaI",       "mw": 149.8900, "factor": 1.0, "oxide_mw": 149.8900},
     "Nb2O5":   {"raw": "Nb2O5",     "mw": 265.8100, "factor": 1.0, "oxide_mw": 265.8100},
     "CaF2":    {"raw": "CaF2",      "mw": 78.0700,  "factor": 1.0, "oxide_mw": 78.0700},
-    "ZnSe":    {"raw": "ZnSe",      "mw": 144.3500, "factor": 1.0, "oxide_mw": 144.3500},
+    "ZnSe":    {"raw": "ZnSe",      "mw": 144.3510, "factor": 1.0, "oxide_mw": 144.3510},
     "MgO":     {"raw": "MgO",       "mw": 40.3040,  "factor": 1.0, "oxide_mw": 40.3040},
     "Sb2O3":   {"raw": "Sb2O3",     "mw": 291.5000, "factor": 1.0, "oxide_mw": 291.5000},
 }
