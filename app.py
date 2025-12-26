@@ -8,31 +8,21 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- STİL VE GÖRÜNÜM (CSS) ---
+# --- CSS: SİYAH YAZI VE TEMİZ GÖRÜNÜM ---
 st.markdown("""
     <style>
-    /* Genel Arka Plan ve Yazı Rengi */
-    .stApp {
-        background-color: #ffffff;
-        color: #000000;
-    }
+    /* Genel Ayarlar */
+    .stApp { background-color: #ffffff; color: #000000; }
+    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, div, span, th, td { color: #000000 !important; }
     
-    /* Tüm Yazıları Siyah Yap */
-    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown, .stMetricValue, .stMetricLabel, div {
-        color: #000000 !important;
-    }
+    /* Inputlar */
+    .stNumberInput input { color: #000000 !important; background-color: #f0f2f6 !important; font-weight: bold; }
     
-    /* Input Alanları */
-    .stNumberInput input {
-        color: #000000 !important;
-        background-color: #f0f2f6 !important;
-    }
-
     /* Sidebar */
-    [data-testid="stSidebar"] {
-        background-color: #f8f9fa !important;
-        border-right: 1px solid #ddd;
-    }
+    [data-testid="stSidebar"] { background-color: #f8f9fa !important; border-right: 1px solid #ddd; }
+    
+    /* Butonlar */
+    .stButton button { width: 100%; border-radius: 5px; font-weight: bold; }
 
     /* Başlık Kutusu */
     .header-box {
@@ -41,40 +31,25 @@ st.markdown("""
         border-radius: 10px;
         text-align: center;
         margin-bottom: 20px;
+        color: white !important;
     }
-    .header-box h2 {
-        color: #ffffff !important;
-        margin: 0;
-    }
-    .header-box div {
-        color: #f1f1f1 !important;
-    }
-    
-    /* Tablo Yazıları */
-    .dataframe {
-        color: #000000 !important;
-    }
+    .header-box h2, .header-box div { color: white !important; }
     </style>
     """, unsafe_allow_html=True)
 
 # --- BAŞLIK ---
 col_logo, col_title = st.columns([1, 5])
-with col_logo:
-    try:
-        st.image("logo.png", width=120)
-    except:
-        st.write("Logo")
 with col_title:
     st.markdown("""
     <div class="header-box">
         <h2>YTU GLASS RESEARCH GROUP</h2>
-        <div style="font-size: 1rem;">Ultimate Batch Calculator v7.1 (SiO2 Fix)</div>
+        <div style="font-size: 1rem;">Batch Calculator v8.0 (Recipe Manager)</div>
     </div>
     """, unsafe_allow_html=True)
 
-# --- VERİ TABANI (GÜNCELLENMİŞ VE KONTROL EDİLMİŞ) ---
+# --- VERİ TABANI (HASSAS AYARLI) ---
 materials_db = {
-    "SiO2":    {"raw": "SiO2",      "mw": 60.0900,  "factor": 1.0, "oxide_mw": 60.0900}, # GÜNCELLENDİ
+    "SiO2":    {"raw": "SiO2",      "mw": 60.0900,  "factor": 1.0, "oxide_mw": 60.0900},
     "Na2O":    {"raw": "Na2CO3",    "mw": 105.9800, "factor": 1.0, "oxide_mw": 61.9700},
     "Al2O3":   {"raw": "Al2O3",     "mw": 101.9600, "factor": 1.0, "oxide_mw": 101.9600},
     "ZnO":     {"raw": "ZnO",       "mw": 81.3700,  "factor": 1.0, "oxide_mw": 81.3700},
@@ -122,10 +97,14 @@ materials_db = {
     "Sb2O3":   {"raw": "Sb2O3",     "mw": 291.5000, "factor": 1.0, "oxide_mw": 291.5000},
 }
 
-# --- SIDEBAR & SESSION STATE (LAST CALC) ---
-if 'last_recipe' not in st.session_state:
-    st.session_state['last_recipe'] = None
+# --- SESSION STATE (Girdileri ve Kayıtlı Tarifleri Tutmak İçin) ---
+if 'inputs' not in st.session_state:
+    st.session_state['inputs'] = {k: 0.0 for k in materials_db.keys()}
 
+if 'saved_recipes' not in st.session_state:
+    st.session_state['saved_recipes'] = {}
+
+# --- SIDEBAR: RECIPE MANAGER ---
 with st.sidebar:
     st.header("⚙️ Settings")
     target_weight = st.number_input(
@@ -137,55 +116,74 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    # Geçmiş Gösterimi
-    if st.session_state['last_recipe'] is not None:
-        st.info("💾 **Last Calculated:**")
-        st.dataframe(st.session_state['last_recipe'][['Oxide', 'To Weigh (g)']], hide_index=True)
+    st.subheader("💾 Recipe Manager")
     
-    st.markdown("---")
-    st.markdown("© 2025 **YTU Glass Research**")
+    # 1. Kaydetme Bölümü
+    new_recipe_name = st.text_input("Recipe Name", placeholder="e.g. Base Glass 1")
+    if st.button("Save Current Recipe"):
+        if new_recipe_name:
+            # Şu anki inputları kaydet
+            st.session_state['saved_recipes'][new_recipe_name] = st.session_state['inputs'].copy()
+            st.success(f"Saved: {new_recipe_name}")
+        else:
+            st.warning("Enter a name first!")
 
-# --- GİRİŞ KISMI ---
+    st.markdown("---")
+
+    # 2. Yükleme Bölümü
+    if len(st.session_state['saved_recipes']) > 0:
+        selected_recipe = st.selectbox("Select Saved Recipe", list(st.session_state['saved_recipes'].keys()))
+        if st.button("📂 Load Recipe"):
+            # Seçili tarifi inputlara geri yükle
+            st.session_state['inputs'] = st.session_state['saved_recipes'][selected_recipe].copy()
+            st.rerun() # Sayfayı yenile ki değerler kutulara gelsin
+    else:
+        st.info("No saved recipes yet.")
+
+    st.markdown("---")
+    st.caption("© 2025 **YTU Glass Research**")
+
+# --- GİRİŞ KISMI (INPUTS) ---
 st.subheader("1. Composition Input (Parts / Mol %)")
-st.caption("You can enter values totaling more than 100. The app will normalize automatically.")
+st.caption("Enter values below. You can save/load compositions from the sidebar.")
 
 cols = st.columns(4)
-inputs = {}
 i = 0
-for oxide, props in materials_db.items():
+for oxide in materials_db.keys():
     with cols[i % 4]:
+        # Session state'den değeri alarak kutuyu oluşturuyoruz
         val = st.number_input(
             f"{oxide}", 
             min_value=0.0, 
             step=0.1, 
             format="%.2f",
-            key=oxide
+            key=f"widget_{oxide}", # Widget key'i farklı olsun
+            value=st.session_state['inputs'].get(oxide, 0.0)
         )
-        inputs[oxide] = val
+        # Kutudaki değeri ana session değişkenine eşle
+        st.session_state['inputs'][oxide] = val
     i += 1
 
 # Toplam Kontrolü
-total_parts = sum(inputs.values())
+total_parts = sum(st.session_state['inputs'].values())
 if total_parts > 0:
-    st.info(f"**Total Input Sum:** {total_parts:.2f} (Calculations will be scaled to {target_weight}g glass)")
+    st.info(f"**Total Input:** {total_parts:.2f} | **Scaling Target:** {target_weight} g")
 
 # --- HESAPLAMA MOTORU ---
 if total_parts > 0:
     results = []
     
-    # 1. Adım: Tüm girdilerin ağırlıklarını hesapla
+    # 1. Hesaplamalar
     total_oxide_weight_in_mix = 0
-    
     temp_data = []
-    for oxide, val in inputs.items():
+    
+    # Session state'deki inputları kullan
+    for oxide, val in st.session_state['inputs'].items():
         if val > 0:
             props = materials_db[oxide]
-            moles_input = val # Kullanıcının girdiği (Parts)
+            moles_input = val 
             
-            # Bu girdinin Oksit olarak ağırlığı (Camın içinde kalan)
             weight_oxide = moles_input * props['oxide_mw']
-            
-            # Bu girdi için gereken Hammadde ağırlığı
             moles_raw = moles_input * props['factor']
             weight_raw = moles_raw * props['mw']
             
@@ -195,91 +193,64 @@ if total_parts > 0:
                 "Oxide": oxide,
                 "Raw Material": props['raw'],
                 "Raw MW": props['mw'],
-                "Input Moles": moles_input,
-                "Raw Weight (Unscaled)": weight_raw,
-                "Oxide Weight (Unscaled)": weight_oxide
+                "Input Value": moles_input, # Bunu tabloda göstereceğiz
+                "Raw Weight (Unscaled)": weight_raw
             })
             
-    # 2. Adım: Hedef Gramaja (Target Weight) Ölçekleme
+    # 2. Ölçekleme
     if total_oxide_weight_in_mix > 0:
         scaling_factor = target_weight / total_oxide_weight_in_mix
     else:
         scaling_factor = 0
         
     final_batch_list = []
-    final_target_list = []
     
     for item in temp_data:
-        # Ölçeklenmiş Değerler
         final_raw_weight = item["Raw Weight (Unscaled)"] * scaling_factor
-        final_oxide_weight = item["Oxide Weight (Unscaled)"] * scaling_factor
         
-        # Yüzde Hesaplama (Molce)
-        mol_percent = (item["Input Moles"] / total_parts) * 100
-        
-        # Tablo 1: Reçete (Tartılacak)
         final_batch_list.append({
             "Oxide": item["Oxide"],
             "Raw Material": item["Raw Material"],
-            "Mol Mass (g/mol)": f"{item['Raw MW']:.4f}",
+            "Input (Mol/Parts)": f"{item['Input Value']:.2f}", # Kontrol Sütunu
+            "Mol Mass": f"{item['Raw MW']:.4f}",
             "To Weigh (g)": final_raw_weight
-        })
-        
-        # Tablo 2: Hedef Cam İçeriği
-        final_target_list.append({
-            "Oxide": item["Oxide"],
-            "Mol %": f"{mol_percent:.2f}",
-            "Weight in Glass (g)": f"{final_oxide_weight:.4f}"
         })
 
     df_batch = pd.DataFrame(final_batch_list)
-    df_target = pd.DataFrame(final_target_list)
-    
-    # Sonucu Session State'e kaydet
-    st.session_state['last_recipe'] = df_batch
 
     # --- SONUÇ EKRANI ---
     st.divider()
     
-    col_res1, col_res2 = st.columns(2)
+    st.subheader("🧪 Final Batch Recipe")
     
-    # SOL TARAF: TARTIM REÇETESİ
-    with col_res1:
-        st.subheader("🧪 Batch Recipe (To Weigh)")
-        if not df_batch.empty:
-            total_batch_weight = df_batch["To Weigh (g)"].sum()
-            st.metric("Total Batch Powder", f"{total_batch_weight:.4f} g")
-            
-            st.dataframe(
-                df_batch.style.format({"To Weigh (g)": "{:.4f}"}), 
-                use_container_width=True, 
-                hide_index=True
-            )
-            
-            # CSV İndir
-            csv = df_batch.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="📥 Download Recipe (CSV)",
-                data=csv,
-                file_name='ytu_glass_batch.csv',
-                mime='text/csv'
-            )
-
-    # SAĞ TARAF: HEDEF CAM ÖZELLİKLERİ
-    with col_res2:
-        st.subheader("🔍 Target Glass Composition")
-        if not df_target.empty:
-            st.metric("Target Glass Weight", f"{target_weight:.2f} g")
-            
-            st.dataframe(
-                df_target,
-                use_container_width=True,
-                hide_index=True
-            )
-
+    if not df_batch.empty:
+        # Önce Toplamı Göster
+        total_batch_weight = df_batch["To Weigh (g)"].sum()
+        
+        c1, c2 = st.columns([1, 2])
+        with c1:
+            st.metric("Total Powder to Weigh", f"{total_batch_weight:.4f} g")
+        
+        # Tabloyu Göster (Yeni Sütunlarla)
+        st.dataframe(
+            df_batch[["Oxide", "Raw Material", "Input (Mol/Parts)", "To Weigh (g)"]].style.format({
+                "To Weigh (g)": "{:.4f}"
+            }), 
+            use_container_width=True, 
+            hide_index=True
+        )
+        
+        # CSV İndir
+        csv = df_batch.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📥 Download Recipe as CSV",
+            data=csv,
+            file_name='ytu_glass_batch.csv',
+            mime='text/csv'
+        )
 else:
     st.info("Enter values above to start calculation.")
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | Developed for Laboratory Use</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; color: black; opacity: 0.7;'>YTU Glass Research Group | v8.0 Recipe Manager</div>", unsafe_allow_html=True)
